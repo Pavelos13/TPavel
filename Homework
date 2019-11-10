@@ -1,0 +1,92 @@
+#include "pch.h"
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <map>
+using namespace std;
+
+static map <int, string> base = { {0, ""}, {1, "one"}, {2, "two"}, {3, "three"}, {4, "four"}, {5, "five"}, {6, "six"}, {7, "seven"}, {8,"eight"}, {9, "nine"},
+							   {10, "ten"},{11, "eleven"},{12, "twelve"},{13, "thirteen"},{14, "fourteen"},{15, "fifteen"},{16, "sixteen"},{17, "seventeen"},{18, "eighteen"},{19, "nineteen"},
+							   {20, "twenty"}, {30, "thirty"}, {40,"forty"},{50,"fifty"},{60,"sixty"},{70,"seventy"},{80,"eighty"},{90,"ninety"}, };
+
+int Length(int value)
+{
+	int length = 0;
+	while (value > 0)
+	{
+		value /= 10;
+		length++;
+	}
+	return length;
+}
+
+void Translation(int value, vector<string> &ivector)
+{
+	/*map <int, string> base = { {0, ""}, {1, "one"}, {2, "two"}, {3, "three"}, {4, "four"}, {5, "five"}, {6, "six"}, {7, "seven"}, {8,"eight"}, {9, "nine"},
+							   {10, "ten"},{11, "eleven"},{12, "twelve"},{13, "thirteen"},{14, "fourteen"},{15, "fifteen"},{16, "sixteen"},{17, "seventeen"},{18, "eighteen"},{19, "nineteen"},
+							   {20, "twenty"}, {30, "thirty"}, {40,"forty"},{50,"fifty"},{60,"sixty"},{70,"seventy"},{80,"eighty"},{90,"ninety"}, };*/
+	bool avail; // наличие элемента в мапе
+	avail = base.count(value);
+	if (avail != 0) {
+		string dicValue = base[value];
+		if (dicValue != "") {
+			ivector.push_back(dicValue);
+		}
+		return;
+	}
+	if (Length(value) == 3) // трехзначное число
+	{
+		int digit; // деление числа на разряды => тут хранятся цифры числа 
+		digit = value / 100;
+		Translation(digit, ivector);
+		ivector.push_back("hundred");
+		Translation(value % 100, ivector);
+		return;
+	}
+	// 2-ух значное число 	
+	int digit; // деление числа на разряды => тут хранятся цифры числа 
+	digit = value / 10;
+	Translation(digit * 10, ivector);
+	Translation(value % 10, ivector);
+}
+
+string Concat(vector<string> &ivector)
+{
+	string result_word;
+	for (size_t i = 0; i < ivector.size(); i++)
+	{
+		if (i == (ivector.size()-1))
+			result_word += ivector[i];
+		else
+			result_word += ivector[i] + " ";
+	}
+	return result_word;
+}
+
+void MadeVect(int data[], int n, vector<string> &ivector) // data[] - массив исходных чисел, n - их количество
+{
+	vector<string> total(n);
+	string data1;
+	for (size_t i = 0; i < n; i++)
+	{
+		Translation(data[i], ivector);
+		total[i] = Concat(ivector);
+		while (ivector.size() != 0)
+		{
+			ivector.pop_back();
+		}
+	}
+	sort(total.begin(), total.end());
+	return;
+}
+
+int main()
+{
+	setlocale(LC_ALL, "Rus");
+	int data[3] = { 20, 125, 253 }; // массив исходных чисел
+	vector<string> ivector;
+
+	MadeVect(data, 3, ivector);
+
+	return 0;
+}
