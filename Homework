@@ -3,11 +3,14 @@
 #include <vector>
 #include <algorithm>
 #include <map>
+#include <string>
+#include <numeric>
+
 using namespace std;
 
-static map <int, string> base = { {0, ""}, {1, "one"}, {2, "two"}, {3, "three"}, {4, "four"}, {5, "five"}, {6, "six"}, {7, "seven"}, {8,"eight"}, {9, "nine"},
+static map < int, string> base = { {0, ""}, {1, "one"}, {2, "two"}, {3, "three"}, {4, "four"}, {5, "five"}, {6, "six"}, {7, "seven"}, {8,"eight"}, {9, "nine"},
 							   {10, "ten"},{11, "eleven"},{12, "twelve"},{13, "thirteen"},{14, "fourteen"},{15, "fifteen"},{16, "sixteen"},{17, "seventeen"},{18, "eighteen"},{19, "nineteen"},
-							   {20, "twenty"}, {30, "thirty"}, {40,"forty"},{50,"fifty"},{60,"sixty"},{70,"seventy"},{80,"eighty"},{90,"ninety"}, };
+							   {20, "twenty"}, {30, "thirty"}, {40,"forty"},{50,"fifty"},{60,"sixty"},{70,"seventy"},{80,"eighty"},{90,"ninety"} };
 
 int Length(int value)
 {
@@ -22,9 +25,6 @@ int Length(int value)
 
 void Translation(int value, vector<string> &ivector)
 {
-	/*map <int, string> base = { {0, ""}, {1, "one"}, {2, "two"}, {3, "three"}, {4, "four"}, {5, "five"}, {6, "six"}, {7, "seven"}, {8,"eight"}, {9, "nine"},
-							   {10, "ten"},{11, "eleven"},{12, "twelve"},{13, "thirteen"},{14, "fourteen"},{15, "fifteen"},{16, "sixteen"},{17, "seventeen"},{18, "eighteen"},{19, "nineteen"},
-							   {20, "twenty"}, {30, "thirty"}, {40,"forty"},{50,"fifty"},{60,"sixty"},{70,"seventy"},{80,"eighty"},{90,"ninety"}, };*/
 	bool avail; // наличие элемента в мапе
 	avail = base.count(value);
 	if (avail != 0) {
@@ -55,7 +55,7 @@ string Concat(vector<string> &ivector)
 	string result_word;
 	for (size_t i = 0; i < ivector.size(); i++)
 	{
-		if (i == (ivector.size()-1))
+		if (i == (ivector.size() - 1))
 			result_word += ivector[i];
 		else
 			result_word += ivector[i] + " ";
@@ -63,22 +63,49 @@ string Concat(vector<string> &ivector)
 	return result_word;
 }
 
-void MadeVect(int data[], int n, vector<string> &ivector) // data[] - массив исходных чисел, n - их количество
+using values_t = vector<string>;
+using index_t = vector<uint8_t>;
+
+index_t make_sorted_index(values_t const& values) 
 {
-	vector<string> total(n);
-	string data1;
+	index_t index(values.size());
+	iota(index.begin(), index.end(), 0);
+	sort(index.begin(), index.end(), [&values](uint8_t a, uint8_t b) { return values[a] > values[b]; });
+	return index;
+}
+
+void MadeVect(int data[], const int n, vector<string> &ivector) // data[] - массив исходных чисел, n - их количество
+{
+	vector<string> total_w(n);
+	vector<int>total_n(n);
+	for (size_t i = 0; i < n; i++)
+	{
+		total_n[i] = data[i];
+	}
 	for (size_t i = 0; i < n; i++)
 	{
 		Translation(data[i], ivector);
-		total[i] = Concat(ivector);
+		total_w[i] = Concat(ivector);
 		while (ivector.size() != 0)
 		{
 			ivector.pop_back();
 		}
 	}
-	sort(total.begin(), total.end());
+
+	auto index = make_sorted_index(total_w);
+
+	cout << "A = {";
+	for (auto i : index)
+		cout << total_w[i] << ',';
+	cout << "\b}\n";
+
+	cout << "B = {";
+	for (auto i : index)
+		cout << data[i] << ',';
+	cout << "\b}\n";
 	return;
 }
+
 
 int main()
 {
@@ -90,3 +117,4 @@ int main()
 
 	return 0;
 }
+
