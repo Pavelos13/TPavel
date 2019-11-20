@@ -1,0 +1,112 @@
+#include "pch.h"
+#include <iostream>
+#include <vector>
+#include <string>
+#include <map>
+#include <algorithm>
+using namespace std;
+
+class Neighbours
+{
+public:
+	string name_node;
+	vector <string> neighbours;
+};
+
+class Graph
+{
+private:
+	Neighbours A;
+	map <string, Neighbours> graphs;
+public:
+	void Add_node(string name) // добавление вершины
+	{
+		A.name_node = "";
+		graphs.insert(pair<string, Neighbours>(name, A));
+	}
+	void Add_rib(string name1, string name2) // добавление ребра
+	{
+		auto itMap = graphs.begin();
+		itMap = graphs.find(name1);
+		itMap->second.neighbours.push_back(name2);
+	}
+	/*void Delete_rib(string name1, string name2)
+	{
+		auto itMap = graphs.begin();
+		itMap = graphs.find(name1);
+		auto tmp = itMap->second.neighbours;
+
+
+		auto itMap = graphs.begin();
+		itMap = graphs.find(name2);
+		itMap->second.neighbours.push_back(name1);
+	}*/
+	void set() // вывод графа
+	{
+		for (auto i = graphs.begin(); i != graphs.end(); ++i)
+		{
+			cout << i->first << ": ";
+			auto tmp = i->second.neighbours;
+			for (size_t i = 0; i < tmp.size(); i++)
+			{
+				cout << tmp[i];
+			}
+			cout << "\n";
+		}
+	}
+	bool avail_rib(string name1, string name2)   //проверка на наличие ребра между вершинами
+	{
+		auto itMap = graphs.begin();
+		itMap = graphs.find(name1);
+		auto tmp = itMap->second.neighbours;
+		int sum = 0;
+		for (size_t i = 0; i < tmp.size(); i++)
+		{
+			if (tmp[i] == name2)
+				sum += 1;
+			else
+				sum += 0;
+		}
+		if (sum > 0)
+		{
+			auto it2_Map = graphs.begin();
+			it2_Map = graphs.find(name2);
+			auto tmp2 = it2_Map->second.neighbours;
+			int sum2 = 0;
+			for (size_t i = 0; i < tmp2.size(); i++)
+			{
+				if (tmp2[i] == name1)
+					sum2 += 1;
+				else
+					sum2 += 0;
+			}
+			if (sum2 > 0) {
+				cout << "True";
+				return 1;
+			}
+			else {
+				cout << "False";
+				return 0;
+			}
+
+		}
+		else {
+			cout << "False";
+			return 0;
+		}
+
+	}
+};
+
+int main()
+{
+	setlocale(LC_ALL, "Rus");
+	Graph Airplane;
+	Airplane.Add_node("Paris");
+	Airplane.Add_node("Berlin");
+	Airplane.Add_rib("Berlin", "Paris");
+	Airplane.Add_rib("Paris", "Berlin");
+	/*Airplane.set();*/
+	Airplane.avail_rib("Paris", "Berlin");
+	return 0;
+}
