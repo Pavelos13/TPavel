@@ -24,23 +24,35 @@ public:
 		A.name_node = "";
 		graphs.insert(pair<string, Neighbours>(name, A));
 	}
+	void Delete_node(string name) // удаление вершины
+	{
+		// удаляю вершину из ключей
+		/*auto itMap = graphs.begin();
+		itMap = graphs.find(name);
+		itMap->second.neighbours.clear();*/
+		for (auto it = graphs.begin(); it != graphs.end(); ++it) {
+			Delete_rib(name, it->first);
+		}
+		graphs.erase(name);
+	}
 	void Add_rib(string name1, string name2) // добавление ребра
 	{
 		auto itMap = graphs.begin();
 		itMap = graphs.find(name1);
 		itMap->second.neighbours.push_back(name2);
 	}
-	/*void Delete_rib(string name1, string name2)
+	void Delete_rib(string name1, string name2) // удаление ребра
 	{
 		auto itMap = graphs.begin();
 		itMap = graphs.find(name1);
-		auto tmp = itMap->second.neighbours;
+		auto it = find(itMap->second.neighbours.begin(), itMap->second.neighbours.end(), name2);
+		itMap->second.neighbours.erase(it);
 
-
-		auto itMap = graphs.begin();
+		itMap = graphs.begin();
 		itMap = graphs.find(name2);
-		itMap->second.neighbours.push_back(name1);
-	}*/
+		it = find(itMap->second.neighbours.begin(), itMap->second.neighbours.end(), name1);
+		itMap->second.neighbours.erase(it);
+	}
 	void set() // вывод графа
 	{
 		for (auto i = graphs.begin(); i != graphs.end(); ++i)
@@ -49,20 +61,19 @@ public:
 			auto tmp = i->second.neighbours;
 			for (size_t i = 0; i < tmp.size(); i++)
 			{
-				cout << tmp[i];
+				cout << tmp[i] + " ";
 			}
 			cout << "\n";
 		}
 	}
-	bool avail_rib(string name1, string name2)   //проверка на наличие ребра между вершинами
+	bool Avail_rib(string name1, string name2)   //проверка на наличие ребра между вершинами
 	{
 		auto itMap = graphs.begin();
 		itMap = graphs.find(name1);
-		auto tmp = itMap->second.neighbours;
 		int sum = 0;
-		for (size_t i = 0; i < tmp.size(); i++)
+		for (size_t i = 0; i < itMap->second.neighbours.size(); i++)
 		{
-			if (tmp[i] == name2)
+			if (itMap->second.neighbours[i] == name2)
 				sum += 1;
 			else
 				sum += 0;
@@ -71,27 +82,26 @@ public:
 		{
 			auto it2_Map = graphs.begin();
 			it2_Map = graphs.find(name2);
-			auto tmp2 = it2_Map->second.neighbours;
 			int sum2 = 0;
-			for (size_t i = 0; i < tmp2.size(); i++)
+			for (size_t i = 0; i < it2_Map->second.neighbours.size(); i++)
 			{
-				if (tmp2[i] == name1)
+				if (it2_Map->second.neighbours[i] == name1)
 					sum2 += 1;
 				else
 					sum2 += 0;
 			}
 			if (sum2 > 0) {
-				cout << "True";
+				cout << "True, rib in both directions\n";
 				return 1;
 			}
 			else {
-				cout << "False";
+				cout << "Rib from " << name1 << " to " << name2 << "\n";
 				return 0;
 			}
 
 		}
 		else {
-			cout << "False";
+			cout << "False\n";
 			return 0;
 		}
 
@@ -104,9 +114,12 @@ int main()
 	Graph Airplane;
 	Airplane.Add_node("Paris");
 	Airplane.Add_node("Berlin");
+	Airplane.Add_node("Moscow");
 	Airplane.Add_rib("Berlin", "Paris");
 	Airplane.Add_rib("Paris", "Berlin");
-	/*Airplane.set();*/
-	Airplane.avail_rib("Paris", "Berlin");
+	Airplane.Add_rib("Paris", "Moscow");
+	Airplane.set();
+	Airplane.Delete_node("Paris");
+	Airplane.set();
 	return 0;
 }
