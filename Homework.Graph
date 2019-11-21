@@ -31,9 +31,14 @@ public:
 		itMap = graphs.find(name);
 		itMap->second.neighbours.clear();*/
 		for (auto it = graphs.begin(); it != graphs.end(); ++it) {
-			Delete_rib(name, it->first);
+			if (it->first == name) {
+				graphs.erase(name);
+				break;
+			}
+			
+			else
+				Delete_rib(name, it->first);
 		}
-		graphs.erase(name);
 	}
 	void Add_rib(string name1, string name2) // добавление ребра
 	{
@@ -118,6 +123,8 @@ int main()
 	Airplane.Add_rib("Berlin", "Paris");
 	Airplane.Add_rib("Paris", "Berlin");
 	Airplane.Add_rib("Paris", "Moscow");
+	Airplane.Add_rib("Moscow", "Paris");
+	Airplane.Add_rib("Berlin", "Moscow");
 	Airplane.set();
 	Airplane.Delete_node("Paris");
 	Airplane.set();
