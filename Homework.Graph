@@ -5,10 +5,9 @@
 #include <map>
 #include <algorithm>
 #include <queue>
-#include <iterator>
 using namespace std;
 
-class Neighbours
+class Node
 {
 public:
 	string name_node;
@@ -18,13 +17,22 @@ public:
 class Graph
 {
 private:
-	Neighbours A;
-	map <string, Neighbours> graphs;
+	Node A;
+	map <string, Node> graphs;
+	bool orientation;   // проверка на тип графа. если граф ориентированный, то orientation = 1, иначе 0 
 public:
+	Graph () {
+		cout << "Введите тип графа: ориентированный - 1 // неориентированный - 0\n";
+		int solution_user;
+		cin >> solution_user;
+		orientation = solution_user;
+	}
 	void Add_node(string name) // добавление вершины
 	{
-		A.name_node = "";
-		graphs.insert(pair<string, Neighbours>(name, A));
+		if (orientation == 1 || orientation == 0) {
+			A.name_node = "";
+			graphs.insert(pair<string, Node>(name, A));
+		}
 	}
 	void Delete_node(string name) // удаление вершины
 	{
@@ -43,20 +51,39 @@ public:
 	}
 	void Add_rib(string name1, string name2) // добавление ребра
 	{
-		auto itMap = graphs.begin();
-		itMap = graphs.find(name1);
-		itMap->second.neighbours.push_back(name2);
+		if (orientation == 1) { // ориентированный
+			auto itMap = graphs.begin();
+			itMap = graphs.find(name1);
+			itMap->second.neighbours.push_back(name2);
+		}
+
+		if (orientation == 0) { // неориентированный 
+			auto itMap = graphs.begin();
+			itMap = graphs.find(name1);
+			itMap->second.neighbours.push_back(name2);
+
+			itMap = graphs.begin();
+			itMap = graphs.find(name2);
+			itMap->second.neighbours.push_back(name1);
+		}
 	}
 	void Delete_rib(string name1, string name2) // удаление ребра
 	{
+		if (orientation == 1) { // ориентированный
+			auto itMap = graphs.find(name1);
+			auto it = find(itMap->second.neighbours.begin(), itMap->second.neighbours.end(), name2);
+			itMap->second.neighbours.erase(it);
+		}
 
-		auto itMap = graphs.find(name1);
-		auto it = find(itMap->second.neighbours.begin(), itMap->second.neighbours.end(), name2);
-		itMap->second.neighbours.erase(it);
+		if (orientation == 0) { //неориентированный
+			auto itMap = graphs.find(name1);
+			auto it = find(itMap->second.neighbours.begin(), itMap->second.neighbours.end(), name2);
+			itMap->second.neighbours.erase(it);
 
-		itMap = graphs.find(name2);
-		it = find(itMap->second.neighbours.begin(), itMap->second.neighbours.end(), name1);
-		itMap->second.neighbours.erase(it);
+			itMap = graphs.find(name2);
+			it = find(itMap->second.neighbours.begin(), itMap->second.neighbours.end(), name1);
+			itMap->second.neighbours.erase(it);
+		}
 	}
 	void set() // вывод графа
 	{
@@ -85,64 +112,54 @@ public:
 		}
 		if (sum > 0)
 		{
-			auto it2_Map = graphs.begin();
-			it2_Map = graphs.find(name2);
-			int sum2 = 0;
-			for (size_t i = 0; i < it2_Map->second.neighbours.size(); i++)
-			{
-				if (it2_Map->second.neighbours[i] == name1)
-					sum2 += 1;
-				else
-					sum2 += 0;
-			}
-			if (sum2 > 0) {
-				cout << "True, rib in both directions\n";
-				return 1;
-			}
-			else {
-				cout << "Rib from " << name1 << " to " << name2 << "\n";
-				return 0;
-			}
-
-		}
-		else {
-			cout << "False\n";
+			if (orientation == 1)
+				cout << "Есть ребро от " << name1 << " до " << name2 << "\n";
+			if (orientation == 0)
+				cout << "Ребро есть";
 			return 0;
 		}
-
-	}
-	int BFS(string name1, string name2) // найти кратчайшее расстояние от name1 до name2. name1 - исходная вершина, name2 -конечная
-	{
-		queue<string> myQueue;
-		vector<string> ex_nodes;
-
-		ex_nodes.push_back(name1);
-		myQueue.push(name1);
-		int data = 0;
-		while (myQueue.empty() != 1)
-		{
-			string tmp = myQueue.front();
-			if (tmp == name2)
-				break;
-			auto itMap = graphs.find(tmp);
-			for (size_t i = 0; i < itMap->second.neighbours.size(); i++)
-			{
-				int counter = count(ex_nodes.begin(), ex_nodes.end(), itMap->second.neighbours[i]);
-				if (counter == 0)
-				{
-					ex_nodes.push_back(itMap->second.neighbours[i]);
-					myQueue.push(itMap->second.neighbours[i]);
-					if (itMap->second.neighbours[i] == name2) {
-						data++;
-						return data;
-					}	
-				}
-				counter = 0;
-			}
-			myQueue.pop();
-			data++;
+		else {
+			cout << "Ребра нет\n";
+			return 0;
 		}
-		return data;
+	}
+
+	void BFS(string name1, string name2) // найти кратчайшее расстояние от name1 до name2. name1 - исходная вершина, name2 -конечная
+	{
+		if (orientation == 1 || orientation == 0) {
+			queue<string> myQueue;
+			vector<string> ex_nodes;
+
+			ex_nodes.push_back(name1);
+			myQueue.push(name1);
+			int data = 0;
+			while (myQueue.empty() != 1)
+			{
+				string tmp = myQueue.front();
+				if (tmp == name2)
+					break;
+				auto itMap = graphs.find(tmp);
+				for (size_t i = 0; i < itMap->second.neighbours.size(); i++)
+				{
+					int counter = count(ex_nodes.begin(), ex_nodes.end(), itMap->second.neighbours[i]);
+					if (counter == 0)
+					{
+						ex_nodes.push_back(itMap->second.neighbours[i]);
+						myQueue.push(itMap->second.neighbours[i]);
+						if (itMap->second.neighbours[i] == name2) {
+							data++;
+							cout << "Расстояние от " << name1 << " до " << name2 << " : "<< data;
+							return;
+						}
+					}
+					counter = 0;
+				}
+				myQueue.pop();
+				data++;
+			}
+			cout << "Путь не найден, так как ни одна вершина не соединена с искомой";
+			return;
+		}
 	}
 };
 
@@ -155,15 +172,10 @@ int main()
 	Airplane.Add_node("Paris");
 	Airplane.Add_node("Berlin");
 	Airplane.Add_node("Moscow");
-	Airplane.Add_node("Rome");
-	Airplane.Add_rib("Berlin", "Paris");
 	Airplane.Add_rib("Paris", "Berlin");
-	Airplane.Add_rib("Paris", "Moscow");
-	Airplane.Add_rib("Paris", "Rome");
-	Airplane.Add_rib("Moscow", "Paris");
-	Airplane.Add_rib("Moscow", "Berlin");
 	Airplane.Add_rib("Berlin", "Moscow");
 	Airplane.set();
-	cout << Airplane.BFS("Paris", "Berlin");
+	Airplane.BFS("Berlin", "Paris");
+	
 	return 0;
 }
