@@ -8,7 +8,7 @@
 
 using namespace std;
 
-static map < int, string> base = { {0, ""}, {1, "one"}, {2, "two"}, {3, "three"}, {4, "four"}, {5, "five"}, {6, "six"}, {7, "seven"}, {8,"eight"}, {9, "nine"},
+static map < int, string> base = { {0, "zero"}, {1, "one"}, {2, "two"}, {3, "three"}, {4, "four"}, {5, "five"}, {6, "six"}, {7, "seven"}, {8,"eight"}, {9, "nine"},
 							   {10, "ten"},{11, "eleven"},{12, "twelve"},{13, "thirteen"},{14, "fourteen"},{15, "fifteen"},{16, "sixteen"},{17, "seventeen"},{18, "eighteen"},{19, "nineteen"},
 							   {20, "twenty"}, {30, "thirty"}, {40,"forty"},{50,"fifty"},{60,"sixty"},{70,"seventy"},{80,"eighty"},{90,"ninety"} };
 
@@ -29,9 +29,9 @@ void Translation(int value, vector<string> &ivector)
 	avail = base.count(value);
 	if (avail != 0) {
 		string dicValue = base[value];
-		if (dicValue != "") {
-			ivector.push_back(dicValue);
-		}
+		/*if (dicValue != "") {*/
+		ivector.push_back(dicValue);
+		/*}*/
 		return;
 	}
 	if (Length(value) == 3) // трехзначное число
@@ -66,11 +66,11 @@ string Concat(vector<string> &ivector)
 using values_t = vector<string>;
 using index_t = vector<uint8_t>;
 
-index_t make_sorted_index(values_t const& values) 
+index_t make_sorted_index(values_t const& values)
 {
 	index_t index(values.size());
 	iota(index.begin(), index.end(), 0);
-	sort(index.begin(), index.end(), [&values](uint8_t a, uint8_t b) { return values[a] > values[b]; });
+	sort(index.begin(), index.end(), [&values](uint8_t a, uint8_t b) { return values[a] < values[b]; });
 	return index;
 }
 
@@ -110,11 +110,17 @@ void MadeVect(int data[], const int n, vector<string> &ivector) // data[] - ма
 int main()
 {
 	setlocale(LC_ALL, "Rus");
-	int data[3] = { 20, 125, 253 }; // массив исходных чисел
+	int size;
+	cout << "Введите количество чисел";
+	cin >> size;
+	int *data = new int[size];
+	for (size_t i = 0; i < size; i++)
+	{
+		cin >> data[i];
+	}
 	vector<string> ivector;
 
-	MadeVect(data, 3, ivector);
+	MadeVect(data, size, ivector);
 
 	return 0;
 }
-
