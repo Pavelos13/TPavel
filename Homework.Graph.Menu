@@ -1,0 +1,88 @@
+#include "pch.h"
+#include "Graph.h"
+
+
+void main()
+{
+	setlocale(LC_ALL, "Rus");
+	int key = 0;
+	string give_1 = "";
+	string give_2 = "";
+	cout << "Выберите тип графа ориентированный- 1 / неориентированный- 0 " << endl;
+	int user_sol;
+	cin >> user_sol;
+	Graph Graph_1(user_sol);
+	while (key != 8) {
+		cout << "1.Добавить вершину" << endl;
+		cout << "2.Удалить вершину" << endl;
+		cout << "3.Добавить ребро" << endl;
+		cout << "4.Удалить ребро" << endl;
+		cout << "5.Проверить наличие ребра" << endl;
+		cout << "6.Найти кратчайший путь" << endl;
+		cout << "7.Вывести граф" << endl;
+		cout << "8.Выход" << endl;
+		cin >> key;
+		system("cls");
+		switch (key)
+		{
+		case 1: {
+			cout << "Введите значение" << endl;
+			cin >> give_1;
+			Graph_1.Add_node(give_1);
+			break;
+		}
+		case 2: {
+			cout << "Введите значение" << endl;
+			cin >> give_1;
+			Graph_1.Delete_node(give_1);
+			break;
+		}
+		case 3: {
+			cout << "Введите первую вершину" << endl;
+			cin >> give_1;
+			cout << "Введите вторую вершину" << endl;
+			cin >> give_2;
+			Graph_1.Add_rib(give_1, give_2);
+			break;
+		}
+		case 4: {
+			cout << "Введите первую вершину" << endl;
+			cin >> give_1;
+			cout << "Введите вторую вершину" << endl;
+			cin >> give_2;
+			Graph_1.Delete_rib(give_1, give_2);
+			break;
+		}
+		case 5: {
+			bool check;
+			cout << "Введите первую вершину" << endl;
+			cin >> give_1;
+			cout << "Введите вторую вершину" << endl;
+			cin >> give_2;
+			check = Graph_1.Avail_rib(give_1, give_2);
+			if (check == 1)
+				cout << "Ребро существует" << endl;
+			else
+				cout << "Ребра нет" << endl;
+			break;
+		}
+		case 6: {
+			cout << "Введите первую вершину" << endl;
+			cin >> give_1;
+			cout << "Введите вторую вершину" << endl;
+			cin >> give_2;
+			Graph_1.BFS(give_1, give_2);
+			break;
+		}
+		case 7: {
+			Graph_1.print();
+			break;
+		}
+		case 8: {
+			break;
+		}
+		default:
+			break;
+		}
+	}
+}
