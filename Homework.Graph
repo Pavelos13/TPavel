@@ -1,3 +1,5 @@
+#pragma once
+
 #include "pch.h"
 #include <iostream>
 #include <vector>
@@ -21,54 +23,82 @@ private:
 	map <string, Node> graphs;
 	bool orientation;   // проверка на тип графа. если граф ориентированный, то orientation = 1, иначе 0 
 public:
-	Graph () {
-		cout << "Введите тип графа: ориентированный - 1 // неориентированный - 0\n";
-		int solution_user;
-		cin >> solution_user;
+	Graph(int solution_user) {
 		orientation = solution_user;
 	}
 	void Add_node(string name) // добавление вершины
 	{
 		if (orientation == 1 || orientation == 0) {
-			A.name_node = "";
-			graphs.insert(pair<string, Node>(name, A));
+
+			int counter = graphs.count(name);
+			if (counter == 1) {
+				cout << "Данная вершина существует" << endl;
+				return;
+			}
+			else {
+				A.name_node = "";
+				graphs.insert(pair<string, Node>(name, A));
+			}
 		}
 	}
 	void Delete_node(string name) // удаление вершины
 	{
-		// удаляю вершину из ключей
-		for (auto it = graphs.begin(); it != graphs.end(); ++it) {
-			if (it->first == name) {
-				it->second.neighbours.clear();
+		if (orientation == 1 || orientation == 0) {
+			// удаляю вершину из ключей
+
+			int counter = graphs.count(name);
+			if (counter == 0) {
+				cout << "Вершины не существует" << endl;
+				return;
 			}
 			else {
-				auto itMap = graphs.find(it->first);
-				auto tmp = find(itMap->second.neighbours.begin(), itMap->second.neighbours.end(), name);
-				itMap->second.neighbours.erase(tmp);
+				for (auto& item : graphs) {
+					if (item.first == name) {
+						item.second.neighbours.clear();
+					}
+					else {
+						auto itMap = graphs.find(item.first);
+						auto tmp = find(itMap->second.neighbours.begin(), itMap->second.neighbours.end(), name);
+						if (count(itMap->second.neighbours.begin(), itMap->second.neighbours.end(), name) != 0)
+							itMap->second.neighbours.erase(tmp);
+					}
+				}
+				graphs.erase(name);
 			}
 		}
-		graphs.erase(name);
 	}
 	void Add_rib(string name1, string name2) // добавление ребра
 	{
-		if (orientation == 1) { // ориентированный
-			auto itMap = graphs.begin();
-			itMap = graphs.find(name1);
-			itMap->second.neighbours.push_back(name2);
+		bool check = Avail_rib(name1, name2);
+		if (check == 1) {
+			cout << "Ребро уже существует" << endl;
+			return;
 		}
+		else {
+			if (orientation == 1) { // ориентированный
+				auto itMap = graphs.begin();
+				itMap = graphs.find(name1);
+				itMap->second.neighbours.push_back(name2);
+			}
 
-		if (orientation == 0) { // неориентированный 
-			auto itMap = graphs.begin();
-			itMap = graphs.find(name1);
-			itMap->second.neighbours.push_back(name2);
+			if (orientation == 0) { // неориентированный 
+				auto itMap = graphs.begin();
+				itMap = graphs.find(name1);
+				itMap->second.neighbours.push_back(name2);
 
-			itMap = graphs.begin();
-			itMap = graphs.find(name2);
-			itMap->second.neighbours.push_back(name1);
+				itMap = graphs.begin();
+				itMap = graphs.find(name2);
+				itMap->second.neighbours.push_back(name1);
+			}
 		}
 	}
 	void Delete_rib(string name1, string name2) // удаление ребра
 	{
+		bool check = Avail_rib(name1, name2);
+		if (check == 0) {
+			cout << "Ребро не существует" << endl;
+			return;
+		}
 		if (orientation == 1) { // ориентированный
 			auto itMap = graphs.find(name1);
 			auto it = find(itMap->second.neighbours.begin(), itMap->second.neighbours.end(), name2);
@@ -85,7 +115,7 @@ public:
 			itMap->second.neighbours.erase(it);
 		}
 	}
-	void set() // вывод графа
+	void print() // вывод графа
 	{
 		for (auto i = graphs.begin(); i != graphs.end(); ++i)
 		{
@@ -95,7 +125,7 @@ public:
 			{
 				cout << tmp[i] + " ";
 			}
-			cout << "\n";
+			cout << endl;
 		}
 	}
 	bool Avail_rib(string name1, string name2)   //проверка на наличие ребра между вершинами
@@ -113,19 +143,31 @@ public:
 		if (sum > 0)
 		{
 			if (orientation == 1)
-				cout << "Есть ребро от " << name1 << " до " << name2 << "\n";
+				return 1;
+
 			if (orientation == 0)
-				cout << "Ребро есть";
-			return 0;
+				return 1;
+
+
 		}
-		else {
-			cout << "Ребра нет\n";
+		else
 			return 0;
-		}
 	}
 
 	void BFS(string name1, string name2) // найти кратчайшее расстояние от name1 до name2. name1 - исходная вершина, name2 -конечная
 	{
+
+		int counter = graphs.count(name1);
+		if (counter == 0) {
+			cout << "Вершины не существует " << name1 << endl;
+			return;
+		}
+		counter = graphs.count(name2);
+		if (counter == 0) {
+			cout << "Вершины не существует " << name2 << endl;
+			return;
+		}
+
 		if (orientation == 1 || orientation == 0) {
 			queue<string> myQueue;
 			vector<string> ex_nodes;
@@ -148,7 +190,7 @@ public:
 						myQueue.push(itMap->second.neighbours[i]);
 						if (itMap->second.neighbours[i] == name2) {
 							data++;
-							cout << "Расстояние от " << name1 << " до " << name2 << " : "<< data;
+							cout << "Расстояние от " << name1 << " до " << name2 << " : " << data << endl;
 							return;
 						}
 					}
@@ -157,25 +199,10 @@ public:
 				myQueue.pop();
 				data++;
 			}
-			cout << "Путь не найден, так как ни одна вершина не соединена с искомой";
+			cout << "Путь не найден, так как ни одна вершина не соединена с искомой" << endl;
 			return;
 		}
 	}
 };
 
 
-
-int main()
-{
-	setlocale(LC_ALL, "Rus");
-	Graph Airplane;
-	Airplane.Add_node("Paris");
-	Airplane.Add_node("Berlin");
-	Airplane.Add_node("Moscow");
-	Airplane.Add_rib("Paris", "Berlin");
-	Airplane.Add_rib("Berlin", "Moscow");
-	Airplane.set();
-	Airplane.BFS("Berlin", "Paris");
-	
-	return 0;
-}
