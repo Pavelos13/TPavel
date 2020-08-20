@@ -1,1 +1,2 @@
-# HomeWork 3 sem
+# Homework 3 sem
+C++
